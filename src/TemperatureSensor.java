@@ -33,7 +33,7 @@ public class TemperatureSensor {
 
                 if (numRead > 0) {
                     String data = new String(readBuffer, 0, numRead);
-                    System.out.print("Données reçues : " + data);
+                    System.out.print("Données temperature : " + data);
 
                   
                     byte[] HumiditeData = new byte[20];
@@ -41,21 +41,12 @@ public class TemperatureSensor {
 
                     if (HumiditeRead > 0) {
                         String HumiditeValue = new String(HumiditeData, 0, HumiditeRead);
-                        System.out.print("Humidite : " + HumiditeValue + "mv");
-                    }
-                    
-                  
-
-                    byte[] temperatureData = new byte[20];
-                    int numTemperatureRead = serialPort.readBytes(temperatureData, temperatureData.length);
-
-                    if (numTemperatureRead > 0) {
-                        String temperatureValue = new String(temperatureData, 0, numTemperatureRead);
-                        System.out.print("Température lue depuis A1 : " + temperatureValue + "c");
+                        System.out.println("Humidite : " + HumiditeValue + "mv");
                     }
                 }
 
                 Thread.sleep(1000);
+                System.out.println(); // Ajoutez une nouvelle ligne pour la prochaine série de lectures
             }
         } catch (Exception e) {
             e.printStackTrace();
