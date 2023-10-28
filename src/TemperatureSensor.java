@@ -9,8 +9,9 @@ import java.sql.SQLException;
 
 import java.util.Date;/**representer la date */
 import java.util.Properties;/**gérer des propriétés sous forme de paires clé-valeur utilisée pour la gestion de configurations */
-import org.postgresql.Driver;/**permet d’accéder à la classe du pilote PostgreSQL, qui implémente l’interface JDBC () */
+import org.postgresql.Driver;
 
+/**permet d’accéder à la classe du pilote PostgreSQL, qui implémente l’interface JDBC () */
 
 /**
  * Le pilote JDBC PostgreSQL permet aux programmes Java de se connecter à une
@@ -77,7 +78,7 @@ public class TemperatureSensor {
                 int numRead = serialPort.readBytes(readBuffer, readBuffer.length);
                 /** lire les données depuis le port série avec a longueur maximal desirer */
 
-                /**si longueur est supperieur a 0 alors il ya des donnee */
+                /** si longueur est supperieur a 0 alors il ya des donnee */
                 if (numRead > 0) {
                     String data = new String(readBuffer, 0, numRead);/**
                                                                       * utilisée pour convertir un tableau d'octets en
