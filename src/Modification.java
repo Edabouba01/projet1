@@ -16,7 +16,8 @@ public class Modification {
 
             while (!scanner.hasNextInt()) {
                 System.out.println("Entrez une valeur valide (entier 1 à ...)");
-                scanner.next();
+                scanner.next(); // Consommer l'entrée invalide
+            }
             prends = scanner.nextInt();
             scanner.nextLine();
 
@@ -31,12 +32,12 @@ public class Modification {
                 System.out.print("Entrez la nouvelle adresse IP : ");
                 while (!scanner.hasNextInt()) {
                     System.out.println("Veuillez entrer une adresse IP valide (entier).");
-                    scanner.next(); 
+                    scanner.next(); // Consommer l'entrée invalide
                 }
                 newAdresseIP = scanner.nextInt();
-                scanner.nextLine(); 
+                scanner.nextLine(); // Consommer la nouvelle ligne après le nombre
 
-                // Mettre à jour les informations dans la table enregistrements
+                // Mettre à jour les informations dans la table 'enregistrements'
                 String modification = "UPDATE enregistrements SET nomobjet = ?, addressip = ? WHERE id = ?";
                 try (PreparedStatement modif = connection.prepareStatement(modification)) {
                     modif.setString(1, newNomObjet);
@@ -48,7 +49,7 @@ public class Modification {
 
                 // Vérifier si l'objet est associé à un capteur
                 if (verifiCapteur(connection, prends)) {
-                    // Mise à jour des informations dans la table capteurs
+                    // Mise à jour des informations dans la table 'capteurs'
                     String modificationCapteur = "UPDATE capteurs SET typemesure = ?, valeur = ? WHERE id_enregistrements = ?";
                     try (PreparedStatement modifCapteur = connection.prepareStatement(modificationCapteur)) {
                         System.out.print("Nouveau type de mesure : ");
@@ -60,17 +61,17 @@ public class Modification {
                             scanner.next();
                         }
                         modifCapteur.setInt(2, scanner.nextInt());
-                        scanner.nextLine(); 
+                        scanner.nextLine(); // Consommer la nouvelle ligne après le nombre
 
                         modifCapteur.setInt(3, prends);
                         modifCapteur.executeUpdate();
-                        System.out.println("Informations du capteur mises à jour.");
+                        System.out.println("Informations du capteur mises à jour avec succès dans la table 'capteurs'.");
                     }
                 }
 
                 // Vérifier si l'objet est associé à un actuateur
                 if (verifiActionneur(connection, prends)) {
-                    // Mise à jour des informations dans la table actuateurs
+                    // Mise à jour des informations dans la table 'actuateurs'
                     String modificationActuateur = "UPDATE actuateurs SET type_action = ? WHERE id_enregistrements = ?";
                     try (PreparedStatement modifActuateur = connection.prepareStatement(modificationActuateur)) {
                         System.out.print("Nouvelle action : ");
@@ -78,13 +79,13 @@ public class Modification {
 
                         modifActuateur.setInt(2, prends);
                         modifActuateur.executeUpdate();
-                        System.out.println("Informations de l'actuateur mises à jour ");
+                        System.out.println("Informations de l'actuateur mises à jour avec succès dans la table 'actuateurs'.");
                     }
                 }
 
             } else {
-                System.out.println("Aucun objet trouvé avec l'ID spécifié");
-            }}
+                System.out.println("Aucun objet trouvé avec l'ID spécifié.");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
