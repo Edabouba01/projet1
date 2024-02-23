@@ -26,11 +26,11 @@ public class Suppression {
                     supprimerActuateurs(connection, id);
                 }
 
-                String requeteSuppression = "DELETE FROM enregistrements WHERE id = ?";
+                String requeteSuppression = "DELETE FROM Equipements WHERE id = ?";
                 try (PreparedStatement statementSuppression = connection.prepareStatement(requeteSuppression)) {
                     statementSuppression.setInt(1, id);
                     statementSuppression.executeUpdate();
-                    System.out.println("Objet supprimé de la table 'enregistrements'");
+                    System.out.println("Objet supprimé de la table 'Equipements'");
                 }
             } else {
                 System.out.println("Aucun objet trouvé avec l'ID spécifié.");
@@ -41,7 +41,7 @@ public class Suppression {
     }
 
     public void supprimerCapteurs(Connection connection, int idObjet) throws SQLException {
-        String requeteSuppression = "DELETE FROM capteurs WHERE id_enregistrements = ?";
+        String requeteSuppression = "DELETE FROM capteurs WHERE id_Equipements = ?";
         try (PreparedStatement statementSuppression = connection.prepareStatement(requeteSuppression)) {
             statementSuppression.setInt(1, idObjet);
             statementSuppression.executeUpdate();
@@ -50,7 +50,7 @@ public class Suppression {
     }
 
     public void supprimerActuateurs(Connection connection, int idObjet) throws SQLException {
-        String requeteSuppression = "DELETE FROM actuateurs WHERE id_enregistrements = ?";
+        String requeteSuppression = "DELETE FROM actuateurs WHERE id_Equipements = ?";
         try (PreparedStatement statementSuppression = connection.prepareStatement(requeteSuppression)) {
             statementSuppression.setInt(1, idObjet);
             statementSuppression.executeUpdate();
@@ -59,7 +59,7 @@ public class Suppression {
     }
 
     public boolean verifier(Connection connection, int idObjet) throws SQLException {
-        String requeteVerification = "SELECT id FROM enregistrements WHERE id = ?";
+        String requeteVerification = "SELECT id FROM Equipements WHERE id = ?";
         try (PreparedStatement statementVerification = connection.prepareStatement(requeteVerification)) {
             statementVerification.setInt(1, idObjet);
             try (ResultSet resultSet = statementVerification.executeQuery()) {
@@ -69,7 +69,7 @@ public class Suppression {
     }
 
     public String getType(Connection connection, int idObjet) throws SQLException {
-        String requeteCapteurs = "SELECT id_enregistrements FROM capteurs WHERE id_enregistrements = ?";
+        String requeteCapteurs = "SELECT id_Equipements FROM capteurs WHERE id_Equipements = ?";
         try (PreparedStatement statementCapteurs = connection.prepareStatement(requeteCapteurs)) {
             statementCapteurs.setInt(1, idObjet);
             try (ResultSet resultSet = statementCapteurs.executeQuery()) {
@@ -79,7 +79,7 @@ public class Suppression {
             }
         }
 
-        String requeteActuateurs = "SELECT id_enregistrements FROM actuateurs WHERE id_enregistrements = ?";
+        String requeteActuateurs = "SELECT id_Equipements FROM actuateurs WHERE id_Equipements = ?";
         try (PreparedStatement statementActuateurs = connection.prepareStatement(requeteActuateurs)) {
             statementActuateurs.setInt(1, idObjet);
             try (ResultSet resultSet = statementActuateurs.executeQuery()) {

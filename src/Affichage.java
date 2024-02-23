@@ -7,17 +7,17 @@ import java.util.Stack;
 public class Affichage {
 
     public static void afficherEnregistrements(Connection connection) {
-        String query = "SELECT * FROM enregistrements";
-        afficherTable(connection, query, "enregistrements");
+        String query = "SELECT * FROM Equipements";
+        afficherTable(connection, query, "Equipements");
     }
 
     public static void afficherCapteurs(Connection connection) {
-        String query = "SELECT capteurs.id, capteurs.id_enregistrements, enregistrements.nomobjet, enregistrements.addressip, capteurs.typemesure, capteurs.valeur, capteurs.timestamp FROM capteurs JOIN enregistrements ON capteurs.id_enregistrements = enregistrements.id";
+        String query = "SELECT capteurs.id, capteurs.id_Equipements, Equipements.nomobjet, Equipements.addressip, capteurs.typemesure, capteurs.valeur, capteurs.timestamp FROM capteurs JOIN Equipements ON capteurs.id_Equipements = Equipements.id";
         afficherTable(connection, query, "capteurs");
     }
 
     public static void afficherActuateurs(Connection connection) {
-        String query = "SELECT actuateurs.id, actuateurs.id_enregistrements, enregistrements.nomobjet, enregistrements.addressip, actuateurs.type_action, actuateurs.timestamp FROM actuateurs JOIN enregistrements ON actuateurs.id_enregistrements = enregistrements.id";
+        String query = "SELECT actuateurs.id, actuateurs.id_Equipements, Equipements.nomobjet, Equipements.addressip, actuateurs.type_action, actuateurs.timestamp FROM actuateurs JOIN Equipements ON actuateurs.id_Equipements = Equipements.id";
         afficherTable(connection, query, "actuateurs");
     }
 

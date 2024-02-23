@@ -3,7 +3,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Date;
 
-public class Actuateur extends Enregistrements {
+public class Actuateur extends Equipements {
     private String typeAction;
 
     public Actuateur(int id, String nomobjet, int addressip, String typeAction) {
@@ -13,7 +13,7 @@ public class Actuateur extends Enregistrements {
     }
 
     public void ajouter(Connection connection) throws SQLException {
-        String insAct = "INSERT INTO actuateurs (id_enregistrements,type_action, timestamp) VALUES (?, ?, ?)";
+        String insAct = "INSERT INTO actuateurs (id_Equipements,type_action, timestamp) VALUES (?, ?, ?)";
         try (PreparedStatement donneeact = connection.prepareStatement(insAct)) {
             donneeact.setInt(1, getId());
             donneeact.setString(2, typeAction);

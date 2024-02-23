@@ -27,13 +27,13 @@ public class Ajout {
             int AdresseIP = scanner.nextInt();
             scanner.nextLine();
 
-            // Insertion des données dans la table 'enregistrements'
-            String insC = "INSERT INTO enregistrements (nomobjet, addressip) VALUES (?, ?)";
+            // Insertion des données dans la table 'Equipements'
+            String insC = "INSERT INTO Equipements (nomobjet, addressip) VALUES (?, ?)";
             try (PreparedStatement donneeC = connection.prepareStatement(insC)) {
                 donneeC.setString(1, nomObjet);
                 donneeC.setInt(2, AdresseIP);
                 donneeC.executeUpdate();
-                System.out.println("Nouvel objet ajouté avec succès à la table 'enregistrements.'");
+                System.out.println("Nouvel objet ajouté avec succès à la table Equipements");
             }
 
             // Choix entre capteur et actionneur
@@ -110,8 +110,8 @@ public class Ajout {
 
     public static int dernierIndex(Connection connection) {
         try {
-            // Récupérer le dernier ID inséré dans la table 'enregistrements'
-            String query = "SELECT MAX(id) FROM enregistrements";
+            // Récupérer le dernier ID inséré dans la table Equipements
+            String query = "SELECT MAX(id) FROM Equipements";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 try (ResultSet resultSet = statement.executeQuery()) {
                     if (resultSet.next()) {
@@ -150,7 +150,7 @@ public class Ajout {
     
     private void genererDonneesCapteur(Connection connection, String nomObjet, int valeur) throws SQLException {
         // Ajouter les données de capteur à la table capteurs
-        String ajoutDonneesQuery = "INSERT INTO capteurs (id_enregistrements, typemesure, valeur, timestamp) VALUES (?, ?, ?, NOW())";
+        String ajoutDonneesQuery = "INSERT INTO capteurs (id_Equipements, typemesure, valeur, timestamp) VALUES (?, ?, ?, NOW())";
         try (PreparedStatement ajoutDonneesStatement = connection.prepareStatement(ajoutDonneesQuery)) {
             ajoutDonneesStatement.setInt(1, dernierIndex(connection));
             ajoutDonneesStatement.setString(2, "temperature");

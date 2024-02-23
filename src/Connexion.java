@@ -24,8 +24,8 @@ public class Connexion {
             createTables(connection);
 
 
-            // Créer la table "enregistrements" pour stocker les informations sur les appareils connectés
-            String tableObjet = "CREATE TABLE IF NOT EXISTS Objetconnectes (id SERIAL PRIMARY KEY, nom_Objet VARCHAR(255) NOT NULL, addressIp INT, timestamp TIMESTAMP NOT NULL)";
+            // Créer la table "Equipements" pour stocker les informations sur les appareils connectés
+            String tableObjet = "CREATE TABLE IF NOT EXISTS Equipements (id SERIAL PRIMARY KEY, nom_Objet VARCHAR(255) NOT NULL, addressIp INT, timestamp TIMESTAMP NOT NULL)";
             try (PreparedStatement prepaObjet = connection.prepareStatement(tableObjet)) {
                 prepaObjet.executeUpdate();
                 System.out.println("Table Objet Connectee créée avec succès.");
@@ -59,14 +59,14 @@ public class Connexion {
     }
 
     private void createEnregistrementsTable(Connection connection) {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS enregistrements (id SERIAL PRIMARY KEY, nomobjet VARCHAR(255) NOT NULL, addressip INT)";
-        executeCreateTable(connection, createTableSQL, "enregistrements");
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS Equipements (id SERIAL PRIMARY KEY, nomobjet VARCHAR(255) NOT NULL, addressip INT)";
+        executeCreateTable(connection, createTableSQL, "Equipements");
     }
 
     private void createCapteursTable(Connection connection) {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS capteurs (" +
                 "id SERIAL PRIMARY KEY, " +
-                "id_enregistrements INTEGER REFERENCES enregistrements(id), " +
+                "id_Equipements INTEGER REFERENCES Equipements(id), " +
                 "typemesure VARCHAR(255) NOT NULL, " + 
                 "valeur INT NOT NULL, " +
                 "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)";
@@ -76,7 +76,7 @@ public class Connexion {
     private void createActuateursTable(Connection connection) {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS actuateurs (" +
                 "id SERIAL PRIMARY KEY, " +
-                "id_enregistrements INTEGER REFERENCES enregistrements(id), " +
+                "id_Equipements INTEGER REFERENCES Equipements(id), " +
                 "type_action VARCHAR(255) NOT NULL, " +
                 "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)";
         executeCreateTable(connection, createTableSQL, "actuateurs");

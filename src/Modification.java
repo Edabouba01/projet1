@@ -16,7 +16,7 @@ public class Modification {
 
             while (!scanner.hasNextInt()) {
                 System.out.println("Entrez une valeur valide (entier 1 à ...)");
-                scanner.next(); // Consommer l'entrée invalide
+                scanner.next(); 
             }
             prends = scanner.nextInt();
             scanner.nextLine();
@@ -37,20 +37,20 @@ public class Modification {
                 newAdresseIP = scanner.nextInt();
                 scanner.nextLine(); // Consommer la nouvelle ligne après le nombre
 
-                // Mettre à jour les informations dans la table 'enregistrements'
-                String modification = "UPDATE enregistrements SET nomobjet = ?, addressip = ? WHERE id = ?";
+                // Mettre à jour les informations dans la table 'Equipements'
+                String modification = "UPDATE Equipements SET nomobjet = ?, addressip = ? WHERE id = ?";
                 try (PreparedStatement modif = connection.prepareStatement(modification)) {
                     modif.setString(1, newNomObjet);
                     modif.setInt(2, newAdresseIP);
                     modif.setInt(3, prends);
                     modif.executeUpdate();
-                    System.out.println("Informations de l'objet mises à jour avec succès dans la table 'enregistrements'.");
+                    System.out.println("Informations de l'objet mises à jour avec succès dans la table 'Equipements'.");
                 }
 
                 // Vérifier si l'objet est associé à un capteur
                 if (verifiCapteur(connection, prends)) {
                     // Mise à jour des informations dans la table 'capteurs'
-                    String modificationCapteur = "UPDATE capteurs SET typemesure = ?, valeur = ? WHERE id_enregistrements = ?";
+                    String modificationCapteur = "UPDATE capteurs SET typemesure = ?, valeur = ? WHERE id_Equipements = ?";
                     try (PreparedStatement modifCapteur = connection.prepareStatement(modificationCapteur)) {
                         System.out.print("Nouveau type de mesure : ");
                         modifCapteur.setString(1, scanner.nextLine());
@@ -72,7 +72,7 @@ public class Modification {
                 // Vérifier si l'objet est associé à un actuateur
                 if (verifiActionneur(connection, prends)) {
                     // Mise à jour des informations dans la table 'actuateurs'
-                    String modificationActuateur = "UPDATE actuateurs SET type_action = ? WHERE id_enregistrements = ?";
+                    String modificationActuateur = "UPDATE actuateurs SET type_action = ? WHERE id_Equipements = ?";
                     try (PreparedStatement modifActuateur = connection.prepareStatement(modificationActuateur)) {
                         System.out.print("Nouvelle action : ");
                         modifActuateur.setString(1, scanner.nextLine());
@@ -92,7 +92,7 @@ public class Modification {
     }
 
     public static boolean verifi(Connection connection, int objetId) throws SQLException {
-        String query = "SELECT id FROM enregistrements WHERE id = ?";
+        String query = "SELECT id FROM Equipements WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, objetId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -102,7 +102,7 @@ public class Modification {
     }
 
     public static boolean verifiCapteur(Connection connection, int objetId) throws SQLException {
-        String query = "SELECT id_enregistrements FROM capteurs WHERE id_enregistrements = ?";
+        String query = "SELECT id_Equipements FROM capteurs WHERE id_Equipements = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, objetId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -112,7 +112,7 @@ public class Modification {
     }
 
     public static boolean verifiActionneur(Connection connection, int objetId) throws SQLException {
-        String query = "SELECT id_enregistrements FROM actuateurs WHERE id_enregistrements = ?";
+        String query = "SELECT id_Equipements FROM actuateurs WHERE id_Equipements = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, objetId);
             try (ResultSet resultSet = statement.executeQuery()) {

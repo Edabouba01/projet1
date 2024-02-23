@@ -2,18 +2,18 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class Enregistrements {
+public class Equipements {
     private int id;
     private String nomobjet;
     private int addressip;
 
-    public Enregistrements(int id, String nomobjet, int addressip) {
+    public Equipements(int id, String nomobjet, int addressip) {
         this.id = id;
         this.nomobjet = nomobjet;
         this.addressip = addressip;
     }
 
-    public static final String TABLE_NAME = "enregistrements";
+    public static final String TABLE_NAME = "Equipements";
 
     public void createTable(Connection connection) throws SQLException {
         String createTableSQL = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (id SERIAL PRIMARY KEY, nomobjet VARCHAR(255) NOT NULL, addressip INT)";

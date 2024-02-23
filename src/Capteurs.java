@@ -3,7 +3,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 
-public class Capteurs extends Enregistrements {
+public class Capteurs extends Equipements {
     protected String typeMesure;
     protected int valeur;
 
@@ -15,9 +15,9 @@ public class Capteurs extends Enregistrements {
 
     public void ajouter(Connection connection) throws SQLException {
         // Insertion des données dans la table 'capteurs'
-        String insC = "INSERT INTO capteurs (id_enregistrements, typemesure, valeur, timestamp) VALUES (?, ?, ?, ?)";
+        String insC = "INSERT INTO capteurs (id_Equipements, typemesure, valeur, timestamp) VALUES (?, ?, ?, ?)";
         try (PreparedStatement donneeC = connection.prepareStatement(insC)) {
-            donneeC.setInt(1, getId());  // ID de la table 'enregistrements'
+            donneeC.setInt(1, getId());  // ID de la table 'Equipements'
             donneeC.setString(2, typeMesure);
             donneeC.setInt(3, valeur);
             donneeC.setTimestamp(4, new java.sql.Timestamp(System.currentTimeMillis()));
