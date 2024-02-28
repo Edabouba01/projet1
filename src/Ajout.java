@@ -14,7 +14,7 @@ public class Ajout {
         try {
             System.out.println("\nAjouter de nouveaux donnees:\n");
 
-            System.out.print("\nObjet connecté associé ");
+            System.out.print("\n Equipement  ");
             System.out.print("Nom objet: ");
             String nomObjet = scanner.nextLine();
 
