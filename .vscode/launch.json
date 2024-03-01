@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "DataServer",
+            "request": "launch",
+            "mainClass": "DataServer",
+            "projectName": "projet1_c060bb42"
+        },
+        {
+            "type": "java",
+            "name": "MicrocontrollerServer",
+            "request": "launch",
+            "mainClass": "MicrocontrollerServer",
+            "projectName": "projet1_c060bb42"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"

@@ -12,7 +12,8 @@ public class Principale {
         Suppression objetspp = new Suppression();
         Modification objetMod = new Modification();
         int donnee;
-        // Créer une pile pour stocker les données 
+
+        // Créer une pile pour stocker les données
         Stack<String> donneesProvenance = new Stack<>();
 
         // Ppile instance de la classe Ajout
@@ -29,28 +30,26 @@ public class Principale {
             System.out.println("2- Entrez 2 pour afficher les donnees enregistrees  ");
             System.out.println("3- Entrez 3 pour Supprimer un objet");
             System.out.println("4- Entrez 4 pour effectuer des modifications sur les données ");
-            System.out.println(" \n----------------------------------------------------------------- \n");
+            System.out.println("5- Entrez 5 pour afficher la pile de données ");
+            System.out.println("6- Entrez 6 pour quitter");
+            System.out.println("\n----------------------------------------------------------------- \n");
             System.out.println("Cliquez ici pour faire un choix :   ");
 
             // vérification pour éviter les erreurs
             if (scanner.hasNextInt()) {
                 donnee = scanner.nextInt();
                 scanner.nextLine();
-
+                DataServer obmic = new DataServer();
                 switch (donnee) {
                     case 1:
                         objetAj.ajouterDonnee(connection, scanner);
-
                         objetAj.simulerDonnees(connection, "temperature", donneesProvenance);
-                       
                         break;
                     case 2:
                         objtAff.afficherEnregistrements(connection);
                         objtAff.afficherCapteurs(connection);
                         objtAff.afficherActuateurs(connection);
-
                         ajout.afficherDonneesPile(donneesProvenance);
-                        ;
                         break;
                     case 3:
                         objetspp.supprimerDonnee(connection, scanner);
@@ -59,15 +58,21 @@ public class Principale {
                         objetMod.mettreAJour(connection, scanner);
                         break;
                     case 5:
+                        // Afficher la pile de données
+                        ajout.afficherDonneesPile(donneesProvenance);
+                        break;
+                    case 6:
                         exit = true;
                         break;
                     default:
-                        System.out.println("Entrez un nombre entre 1 et 4");
+                        System.out.println("Entrez un nombre entre 1 et 6");
                 }
             } else {
-                System.out.println("Entrez un nombre valide entre 1 et 4");
+                System.out.println("Entrez un nombre valide entre 1 et 6");
                 scanner.next();
             }
         }
+
+
     }
 }
