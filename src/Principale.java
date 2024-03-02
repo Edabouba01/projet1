@@ -46,10 +46,8 @@ public class Principale {
                         objetAj.simulerDonnees(connection, "temperature", donneesProvenance);
                         break;
                     case 2:
-                        objtAff.afficherEnregistrements(connection);
-                        objtAff.afficherCapteurs(connection);
-                        objtAff.afficherActuateurs(connection);
-                        ajout.afficherDonneesPile(donneesProvenance);
+                       
+                        
                         break;
                     case 3:
                         objetspp.supprimerDonnee(connection, scanner);
