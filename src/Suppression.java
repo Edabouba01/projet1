@@ -8,70 +8,64 @@ public class Suppression {
 
     public void supprimerDonnee(Connection connection, Scanner scanner) {
         try {
-            System.out.print("Entrez l'ID de l'objet que vous souhaitez supprimer : ");
+            System.out.print("Entrez le nom de l'objet que vous souhaitez supprimer : ");
+            String nomObjet = scanner.nextLine();
 
-            while (!scanner.hasNextInt()) {
-                System.out.println("Veuillez entrer une valeur valide (1 à ...)");
-                scanner.next();
-            }
-            int id = scanner.nextInt();
-            scanner.nextLine();
-
-            if (verifier(connection, id)) {
-                String typeAssociation = getType(connection, id);
+            if (verifier(connection, nomObjet)) {
+                String typeAssociation = getType(connection, nomObjet);
 
                 if ("capteurs".equals(typeAssociation)) {
-                    supprimerCapteurs(connection, id);
+                    supprimerCapteurs(connection, nomObjet);
                 } else if ("actuateurs".equals(typeAssociation)) {
-                    supprimerActuateurs(connection, id);
+                    supprimerActuateurs(connection, nomObjet);
                 }
 
-                String requeteSuppression = "DELETE FROM Equipements WHERE id = ?";
+                String requeteSuppression = "DELETE FROM Equipements WHERE nomobjet = ?";
                 try (PreparedStatement statementSuppression = connection.prepareStatement(requeteSuppression)) {
-                    statementSuppression.setInt(1, id);
+                    statementSuppression.setString(1, nomObjet);
                     statementSuppression.executeUpdate();
                     System.out.println("Objet supprimé de la table 'Equipements'");
                 }
             } else {
-                System.out.println("Aucun objet trouvé avec l'ID spécifié.");
+                System.out.println("Aucun objet trouvé avec le nom spécifié.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public void supprimerCapteurs(Connection connection, int idObjet) throws SQLException {
-        String requeteSuppression = "DELETE FROM capteurs WHERE id_Equipements = ?";
+    public void supprimerCapteurs(Connection connection, String nomObjet) throws SQLException {
+        String requeteSuppression = "DELETE FROM capteurs WHERE id_Equipements IN (SELECT id FROM Equipements WHERE nomobjet = ?)";
         try (PreparedStatement statementSuppression = connection.prepareStatement(requeteSuppression)) {
-            statementSuppression.setInt(1, idObjet);
+            statementSuppression.setString(1, nomObjet);
             statementSuppression.executeUpdate();
             System.out.println("Capteurs associés à l'objet supprimés de la table 'capteurs'");
         }
     }
 
-    public void supprimerActuateurs(Connection connection, int idObjet) throws SQLException {
-        String requeteSuppression = "DELETE FROM actuateurs WHERE id_Equipements = ?";
+    public void supprimerActuateurs(Connection connection, String nomObjet) throws SQLException {
+        String requeteSuppression = "DELETE FROM actuateurs WHERE id_Equipements IN (SELECT id FROM Equipements WHERE nomobjet = ?)";
         try (PreparedStatement statementSuppression = connection.prepareStatement(requeteSuppression)) {
-            statementSuppression.setInt(1, idObjet);
+            statementSuppression.setString(1, nomObjet);
             statementSuppression.executeUpdate();
-            System.out.println("Actionneurs associés à l'objet supprimés de la table 'actuateurs'");
+            System.out.println("Actuateurs associés à l'objet supprimés de la table 'actuateurs'");
         }
     }
 
-    public boolean verifier(Connection connection, int idObjet) throws SQLException {
-        String requeteVerification = "SELECT id FROM Equipements WHERE id = ?";
+    public boolean verifier(Connection connection, String nomObjet) throws SQLException {
+        String requeteVerification = "SELECT id FROM Equipements WHERE nomobjet = ?";
         try (PreparedStatement statementVerification = connection.prepareStatement(requeteVerification)) {
-            statementVerification.setInt(1, idObjet);
+            statementVerification.setString(1, nomObjet);
             try (ResultSet resultSet = statementVerification.executeQuery()) {
                 return resultSet.next();
             }
         }
     }
 
-    public String getType(Connection connection, int idObjet) throws SQLException {
-        String requeteCapteurs = "SELECT id_Equipements FROM capteurs WHERE id_Equipements = ?";
+    public String getType(Connection connection, String nomObjet) throws SQLException {
+        String requeteCapteurs = "SELECT id_Equipements FROM capteurs WHERE id_Equipements IN (SELECT id FROM Equipements WHERE nomobjet = ?)";
         try (PreparedStatement statementCapteurs = connection.prepareStatement(requeteCapteurs)) {
-            statementCapteurs.setInt(1, idObjet);
+            statementCapteurs.setString(1, nomObjet);
             try (ResultSet resultSet = statementCapteurs.executeQuery()) {
                 if (resultSet.next()) {
                     return "capteurs";
@@ -79,9 +73,9 @@ public class Suppression {
             }
         }
 
-        String requeteActuateurs = "SELECT id_Equipements FROM actuateurs WHERE id_Equipements = ?";
+        String requeteActuateurs = "SELECT id_Equipements FROM actuateurs WHERE id_Equipements IN (SELECT id FROM Equipements WHERE nomobjet = ?)";
         try (PreparedStatement statementActuateurs = connection.prepareStatement(requeteActuateurs)) {
-            statementActuateurs.setInt(1, idObjet);
+            statementActuateurs.setString(1, nomObjet);
             try (ResultSet resultSet = statementActuateurs.executeQuery()) {
                 if (resultSet.next()) {
                     return "actuateurs";

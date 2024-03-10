@@ -11,66 +11,67 @@ public class Principale {
         Affichage objtAff = new Affichage();
         Suppression objetspp = new Suppression();
         Modification objetMod = new Modification();
-        int donnee;
+        int choix;
 
         // Créer une pile pour stocker les données
         Stack<String> donneesProvenance = new Stack<>();
 
-        // Ppile instance de la classe Ajout
+        // Pile instance de la classe Ajout
         Ajout ajout = new Ajout();
         ajout.afficherDonneesPile(donneesProvenance);
 
         Connection connection = connect.renvoi(); // Obtenir la connexion avec la base de données et créer les tables
         boolean exit = false;
 
-        while (!exit) {
-            System.out.println("\n\n---------------------------------------------------------------");
-            System.out.println("\n Menu Principal de gestion\n ");
-            System.out.println("1- Entrez 1 pour ajouter des nouveaux donnees ");
-            System.out.println("2- Entrez 2 pour afficher les donnees enregistrees  ");
-            System.out.println("3- Entrez 3 pour Supprimer un objet");
-            System.out.println("4- Entrez 4 pour effectuer des modifications sur les données ");
-            System.out.println("5- Entrez 5 pour afficher la pile de données ");
-            System.out.println("6- Entrez 6 pour quitter");
-            System.out.println("\n----------------------------------------------------------------- \n");
-            System.out.println("Cliquez ici pour faire un choix :   ");
+        System.out.println("Bienvenue dans le Système de Gestion des Données !");
+        System.out.println("---------------------------------------------------------------");
 
-            // vérification pour éviter les erreurs
+        while (!exit) {
+            System.out.println("\n Menu Principal de Gestion\n ");
+            System.out.println("1- Ajouter de nouvelles données");
+            System.out.println("2- Afficher les données enregistrées");
+            System.out.println("3- Supprimer un objet");
+            System.out.println("4- Effectuer des modifications sur les données");
+            System.out.println("5- Afficher la pile de données");
+            System.out.println("6- Quitter");
+            System.out.println("-----------------------------------------------------------------");
+
+            System.out.print("Faites un choix (1-4) : ");
+
             if (scanner.hasNextInt()) {
-                donnee = scanner.nextInt();
-                scanner.nextLine();
-                DataServer obmic = new DataServer();
-                switch (donnee) {
+                choix = scanner.nextInt();
+                scanner.nextLine(); // Consommer la nouvelle ligne après le nombre
+
+                switch (choix) {
                     case 1:
+                        System.out.println("\n------ Ajout de Nouvelles Données ------");
                         objetAj.ajouterDonnee(connection, scanner);
                         objetAj.simulerDonnees(connection, "temperature", donneesProvenance);
                         break;
                     case 2:
-                       
-                        
+                        System.out.println("\n------ Affichage des Données Enregistrées ------");
+                        objtAff.afficherEnregistrements(connection);
+                        objtAff.afficherCapteurs(connection);
+                        objtAff.afficherActuateurs(connection);
                         break;
                     case 3:
+                        System.out.println("\n------ Suppression d'Objet ------");
                         objetspp.supprimerDonnee(connection, scanner);
                         break;
                     case 4:
+                        System.out.println("\n------ Modification des Données ------");
                         objetMod.mettreAJour(connection, scanner);
                         break;
-                    case 5:
-                        // Afficher la pile de données
-                        ajout.afficherDonneesPile(donneesProvenance);
-                        break;
-                    case 6:
-                        exit = true;
-                        break;
+            
                     default:
-                        System.out.println("Entrez un nombre entre 1 et 6");
+                        System.out.println("Entrez un nombre entre 1 et 4");
                 }
             } else {
-                System.out.println("Entrez un nombre valide entre 1 et 6");
-                scanner.next();
+                System.out.println("Entrez un nombre valide entre 1 et 4");
+                scanner.next(); // Consommer l'entrée invalide
             }
         }
 
-
+        scanner.close();
     }
 }
