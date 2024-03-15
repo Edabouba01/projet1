@@ -2,14 +2,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Scanner;
+import javax.swing.JOptionPane;
 
 public class Suppression {
 
-    public void supprimerDonnee(Connection connection, Scanner scanner) {
+    public void supprimerDonnee(Connection connection) {
         try {
-            System.out.print("Entrez le nom de l'objet que vous souhaitez supprimer : ");
-            String nomObjet = scanner.nextLine();
+            String nomObjet = JOptionPane.showInputDialog(null, "Entrez le nom de l'objet que vous souhaitez supprimer :");
 
             if (verifier(connection, nomObjet)) {
                 String typeAssociation = getType(connection, nomObjet);
@@ -24,13 +23,13 @@ public class Suppression {
                 try (PreparedStatement statementSuppression = connection.prepareStatement(requeteSuppression)) {
                     statementSuppression.setString(1, nomObjet);
                     statementSuppression.executeUpdate();
-                    System.out.println("Objet supprimé de la table 'Equipements'");
+                    JOptionPane.showMessageDialog(null, "Objet supprimé de la table 'Equipements'", "Suppression réussie", JOptionPane.INFORMATION_MESSAGE);
                 }
             } else {
-                System.out.println("Aucun objet trouvé avec le nom spécifié.");
+                JOptionPane.showMessageDialog(null, "Aucun objet trouvé avec le nom spécifié.", "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Erreur lors de la suppression : " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -39,7 +38,7 @@ public class Suppression {
         try (PreparedStatement statementSuppression = connection.prepareStatement(requeteSuppression)) {
             statementSuppression.setString(1, nomObjet);
             statementSuppression.executeUpdate();
-            System.out.println("Capteurs associés à l'objet supprimés de la table 'capteurs'");
+            JOptionPane.showMessageDialog(null, "Capteurs associés à l'objet supprimés de la table 'capteurs'", "Suppression réussie", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -48,7 +47,7 @@ public class Suppression {
         try (PreparedStatement statementSuppression = connection.prepareStatement(requeteSuppression)) {
             statementSuppression.setString(1, nomObjet);
             statementSuppression.executeUpdate();
-            System.out.println("Actuateurs associés à l'objet supprimés de la table 'actuateurs'");
+            JOptionPane.showMessageDialog(null, "Actuateurs associés à l'objet supprimés de la table 'actuateurs'", "Suppression réussie", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 

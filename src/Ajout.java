@@ -1,116 +1,87 @@
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Random;
-import java.util.Stack;
-import java.util.Timer;
+import javax.swing.JOptionPane;
 import java.sql.ResultSet;
-import java.util.Scanner;
-import java.util.TimerTask;
 
 public class Ajout {
 
-    public void ajouterDonnee(Connection connection, Scanner scanner) {
+    public void ajouterDonnee(Connection connection) {
         try {
-            System.out.println("\nAjouter de nouveaux donnees:\n");
+            // Affichage du dialogue pour saisir le nom de l'objet
+            String nomObjet = JOptionPane.showInputDialog(null, "Entrez le nom de l'objet:", "Nom de l'objet", JOptionPane.QUESTION_MESSAGE);
 
-            System.out.print("\n Equipement  ");
-            System.out.print("Nom objet: ");
-            String nomObjet = scanner.nextLine();
-
-            // Validation
-            System.out.print("Adresse IP: ");
-            while (!scanner.hasNextInt()) {
-                System.out.println("Veuillez entrer une adresse IP valide");
-                scanner.next(); 
-            }
-            int AdresseIP = scanner.nextInt();
-            scanner.nextLine();
+            // Affichage du dialogue pour saisir l'adresse IP
+            String adresseIPString = JOptionPane.showInputDialog(null, "Entrez l'adresse IP:", "Adresse IP", JOptionPane.QUESTION_MESSAGE);
+            int AdresseIP = Integer.parseInt(adresseIPString);
 
             // Insertion des données dans la table 'Equipements'
-            String insC = "INSERT INTO Equipements (nomobjet, addressip) VALUES (?, ?)";
-            try (PreparedStatement donneeC = connection.prepareStatement(insC)) {
-                donneeC.setString(1, nomObjet);
-                donneeC.setInt(2, AdresseIP);
-                donneeC.executeUpdate();
-                System.out.println("Nouvel objet ajouté avec succès à la table Equipements");
+            String insEquipement = "INSERT INTO Equipements (nomobjet, addressip) VALUES (?, ?)";
+            try (PreparedStatement donneeEquipement = connection.prepareStatement(insEquipement)) {
+                donneeEquipement.setString(1, nomObjet);
+                donneeEquipement.setInt(2, AdresseIP);
+                donneeEquipement.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Nouvel objet ajouté avec succès à la table Equipements", "Succès", JOptionPane.INFORMATION_MESSAGE);
             }
 
-            // Choix entre capteur et actionneur
-            boolean exit = false;
+            // Affichage du menu de gestion capteur ou actionneur
+            Object[] options = {"Ajouter un capteur", "Ajouter un actionneur"};
+            int choix = JOptionPane.showOptionDialog(null, "Menu de gestion capteur ou actionneur", "Menu", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 
-            while (!exit) {
-                System.out.println("\n\n---------------------------------------------------------------");
-                System.out.println("\n Menu de gestion capteur ou actuateur\n ");
-                System.out.println("1- Entrez 1 pour ajouter un capteur ");
-                System.out.println("2- Entrez 2 pour ajouter un actionneur  ");
-                System.out.println(" \n----------------------------------------------------------------- \n");
-                System.out.println("Cliquez ici pour faire un choix :   ");
-
-                // Vérification pour éviter les erreurs
-                if (scanner.hasNextInt()) {
-                    int entree = scanner.nextInt();
-                    scanner.nextLine();
-
-                    switch (entree) {
-                        case 1:
-                            ajouterCapteur(connection, nomObjet, AdresseIP, scanner);
-                            exit = true;
-                            break;
-                        case 2:
-                            ajouterActionneur(connection, nomObjet, AdresseIP, scanner);
-                            exit = true;
-                            break;
-                        default:
-                            System.out.println("Choisissez 1 ou 2");
-                    }
-                } else {
-                    System.out.println("Choisissez 1 ou 2");
-                    scanner.next(); // Éviter une boucle infinie
-                }
+            switch (choix) {
+                case 0:
+                    ajouterCapteur(connection, nomObjet, AdresseIP);
+                    break;
+                case 1:
+                    ajouterActionneur(connection, nomObjet, AdresseIP);
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(null, "Choix invalide", "Erreur", JOptionPane.ERROR_MESSAGE);
             }
 
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Adresse IP invalide", "Erreur", JOptionPane.ERROR_MESSAGE);
         } catch (SQLException e) {
-            System.out.println("Erreur lors de l'ajout des données : " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Erreur lors de l'ajout des données : " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void ajouterCapteur(Connection connection, String nomObjet, int AdresseIP, Scanner scanner) throws SQLException {
-        // Insertion des données dans la table capteurs
-        System.out.print("Type de mesure : ");
-        String typeMesure = scanner.nextLine();
+    private void ajouterCapteur(Connection connection, String nomObjet, int AdresseIP) throws SQLException {
+        // Affichage du dialogue pour saisir le type de mesure
+        String typeMesure = JOptionPane.showInputDialog(null, "Entrez le type de mesure:", "Type de mesure", JOptionPane.QUESTION_MESSAGE);
 
-        // Validation
-        System.out.print("Valeur : ");
-        while (!scanner.hasNextInt()) {
-            System.out.println("Veuillez entrer une valeur valide");
-            scanner.next();
+        // Affichage du dialogue pour saisir la valeur
+        String valeurString = JOptionPane.showInputDialog(null, "Entrez la valeur:", "Valeur", JOptionPane.QUESTION_MESSAGE);
+        int valeur = Integer.parseInt(valeurString);
+
+        // Insertion des données dans la table 'capteurs'
+        String insCapteur = "INSERT INTO capteurs (id_equipements, typemesure, valeur) VALUES (?, ?, ?)";
+        try (PreparedStatement donneeCapteur = connection.prepareStatement(insCapteur)) {
+            donneeCapteur.setInt(1, dernierIndex(connection));
+            donneeCapteur.setString(2, typeMesure);
+            donneeCapteur.setInt(3, valeur);
+            donneeCapteur.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Données insérées dans la table 'capteurs'", "Succès", JOptionPane.INFORMATION_MESSAGE);
         }
-        int valeur = scanner.nextInt();
-        scanner.nextLine();
-
-        // Utilisation de l'héritage
-        Capteurs capteur = new Capteurs(dernierIndex(connection), nomObjet, AdresseIP, typeMesure, valeur);
-        capteur.ajouter(connection);
-
-        System.out.println("Données insérées dans la table 'capteurs'.");
     }
 
-    private void ajouterActionneur(Connection connection, String nomObjet, int AdresseIP, Scanner scanner) throws SQLException {
-        // Insertion des données dans la table actuateurs
-        System.out.print("Type d action : ");
-        String typeaction = scanner.nextLine();
+    private void ajouterActionneur(Connection connection, String nomObjet, int AdresseIP) throws SQLException {
+        // Affichage du dialogue pour saisir le type d'action
+        String typeAction = JOptionPane.showInputDialog(null, "Entrez le type d'action:", "Type d'action", JOptionPane.QUESTION_MESSAGE);
 
-        // Utilisation de l'héritage
-        Actuateur actionneur = new Actuateur(dernierIndex(connection), nomObjet, AdresseIP, typeaction);
-        actionneur.ajouter(connection);
-
-        System.out.println("Données insérées dans la table 'actionneurs'.");
+        // Insertion des données dans la table 'actuateurs'
+        String insActionneur = "INSERT INTO actuateurs (id_equipements, type_action) VALUES (?, ?)";
+        try (PreparedStatement donneeActionneur = connection.prepareStatement(insActionneur)) {
+            donneeActionneur.setInt(1, dernierIndex(connection));
+            donneeActionneur.setString(2, typeAction);
+            donneeActionneur.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Données insérées dans la table 'actuateurs'", "Succès", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     public static int dernierIndex(Connection connection) {
         try {
-            // Récupérer le dernier ID inséré dans la table Equipements
+            // Récupération du dernier ID inséré dans la table Equipements
             String query = "SELECT MAX(id) FROM Equipements";
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 try (ResultSet resultSet = statement.executeQuery()) {
@@ -120,59 +91,8 @@ public class Ajout {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Erreur lors de la récupération du dernier index : " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Erreur lors de la récupération du dernier index : " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
         return -1; 
     }
-
-    public void simulerDonnees(Connection connection, String nomObjet, Stack<String> donnees) {
-        Timer timer = new Timer(true);
-    
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    // generation par random
-                    Random random = new Random();
-                    int valeur = random.nextInt(100); // Valeur aléatoire entre 0 et 100
-    
-                    // Générer des données de capteur aléatoires
-                    genererDonneesCapteur(connection, nomObjet, valeur);
-    
-                    // Ajouter les données à la pile
-                    ajouterDonnee(donnees, "Simulation l'objet : " + nomObjet + "   Valeur  " + valeur);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, 0, 60000); // Générer des données chaque minute
-    }
-    
-    private void genererDonneesCapteur(Connection connection, String nomObjet, int valeur) throws SQLException {
-        // Ajouter les données de capteur à la table capteurs
-        String ajoutDonneesQuery = "INSERT INTO capteurs (id_Equipements, typemesure, valeur, timestamp) VALUES (?, ?, ?, NOW())";
-        try (PreparedStatement ajoutDonneesStatement = connection.prepareStatement(ajoutDonneesQuery)) {
-            ajoutDonneesStatement.setInt(1, dernierIndex(connection));
-            ajoutDonneesStatement.setString(2, "temperature");
-            ajoutDonneesStatement.setInt(3, valeur);
-            ajoutDonneesStatement.executeUpdate();
-        }
-    }
-    private void ajouterDonnee(Stack<String> donnees, String donnee) {
-        // Ajouter les données à la pile
-        donnees.push(donnee);
-    }
-    public void afficherDonneesPile(Stack<String> donnees) {
-        System.out.println("\nAffichage des données de la pile :\n");
-    
-        if (donnees.isEmpty()) {
-            System.out.println("La pile est vide.");
-        } else {
-            while (!donnees.isEmpty()) {
-                String donnee = donnees.pop();
-                System.out.println(donnee);
-            }
-        }
-    }
-    
 }
