@@ -73,7 +73,7 @@ public class GUIPrincipale {
             public void actionPerformed(ActionEvent e) {
                 // Logique pour supprimer une donnée
                 JOptionPane.showMessageDialog(null, "Supprimer une donnée");
-                suppression.supprimerDonnee(connection);
+                
             }
         });
 
@@ -82,7 +82,7 @@ public class GUIPrincipale {
             public void actionPerformed(ActionEvent e) {
                 // Logique pour modifier une donnée
                 JOptionPane.showMessageDialog(null, "Modifier une donnée");
-                modif.mettreAJour(connection);
+                
             }
         });
 

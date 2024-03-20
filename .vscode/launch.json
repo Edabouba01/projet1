@@ -6,6 +6,34 @@
     "configurations": [
         {
             "type": "java",
+            "name": "DataServe",
+            "request": "launch",
+            "mainClass": "DataServe",
+            "projectName": "projet1_c060bb42"
+        },
+        {
+            "type": "java",
+            "name": "DataServerr",
+            "request": "launch",
+            "mainClass": "DataServerr",
+            "projectName": "projet1_c060bb42"
+        },
+        {
+            "type": "java",
+            "name": "DataSer",
+            "request": "launch",
+            "mainClass": "DataSer",
+            "projectName": "projet1_c060bb42"
+        },
+        {
+            "type": "java",
+            "name": "DataServ",
+            "request": "launch",
+            "mainClass": "DataServ",
+            "projectName": "projet1_c060bb42"
+        },
+        {
+            "type": "java",
             "name": "Main",
             "request": "launch",
             "mainClass": "Main",
