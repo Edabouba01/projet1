@@ -49,11 +49,15 @@ public class DataServer {
         server.createContext("/equipements", new EquipementsHandler());
         server.createContext("/data", new DataHandler(this));
         server.createContext("/ajout", new AjoutHandler());
+
+        
         server.createContext("/administrator", new AdministratorHandler());
         server.createContext("/objet", new ObjectHandler());
         server.createContext("/projet", new ProjectHandler());
         server.createContext("/user", new UserHandler());
         server.createContext("/controller", new ControllerHandler());
+        server.createContext("/capteurs", new UserHandler());
+        server.createContext("/actuateur", new ControllerHandler());
         server.setExecutor(null);
         server.start();
     }
@@ -311,7 +315,7 @@ static class AdministratorHandler implements HttpHandler {
             // Établir une connexion à la base de données
             try (Connection connection = new Connexion().renvoi()) {
                 // Préparer la requête SQL pour insérer un nouvel administrateur
-                String query = "INSERT INTO Administrators (name, email, password) VALUES (?, ?, ?)";
+                String query = "INSERT INTO ADMINISTRATORS (name, email, password) VALUES (?, ?, ?)";
                 try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                     preparedStatement.setString(1, name);
                     preparedStatement.setString(2, email);
@@ -389,7 +393,7 @@ static class AdministratorHandler implements HttpHandler {
             // Établir une connexion à la base de données
             try (Connection connection = new Connexion().renvoi()) {
                 // Préparer la requête SQL pour insérer un nouvel objet
-                String insertObjectQuery = "INSERT INTO Objects (name) VALUES (?)";
+                String insertObjectQuery = "INSERT INTO OBJET (name) VALUES (?)";
                 try (PreparedStatement objectStatement = connection.prepareStatement(insertObjectQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
                     objectStatement.setString(1, objectName);
                     // Exécuter la requête pour insérer l'objet
@@ -457,9 +461,9 @@ static class AdministratorHandler implements HttpHandler {
     
                     // Créer un projet
                     if (action.equals("create_project")) {
-                        String projectName = jsonObject.getString("name");
+                        String title = jsonObject.getString("title");
                         JSONArray controllersArray = jsonObject.getJSONArray("controllers");
-                        createProject(projectName, controllersArray);
+                        createProject(title, controllersArray);
                     }
     
                     // Envoyer une réponse de succès au client
@@ -490,13 +494,13 @@ static class AdministratorHandler implements HttpHandler {
             }
         }
     
-        private void createProject(String projectName, JSONArray controllersArray) throws SQLException {
+        private void createProject(String title, JSONArray controllersArray) throws SQLException {
             // Établir une connexion à la base de données
             try (Connection connection = new Connexion().renvoi()) {
                 // Préparer la requête SQL pour insérer un nouveau projet
-                String insertProjectQuery = "INSERT INTO Projects (name) VALUES (?)";
+                String insertProjectQuery = "INSERT INTO PROJECT (title) VALUES (?)";
                 try (PreparedStatement projectStatement = connection.prepareStatement(insertProjectQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                    projectStatement.setString(1, projectName);
+                    projectStatement.setString(1, title);
                     // Exécuter la requête pour insérer le projet
                     projectStatement.executeUpdate();
     
@@ -510,7 +514,7 @@ static class AdministratorHandler implements HttpHandler {
                     // Si l'insertion du projet a réussi, associer les contrôleurs au projet
                     if (projectId != -1) {
                         // Préparer la requête SQL pour associer les contrôleurs au projet
-                        String insertControllerQuery = "INSERT INTO ProjectControllers (project_id, controller_id) VALUES (?, ?)";
+                        String insertControllerQuery = "INSERT INTO PROJECT_CONTROLLERS (project_id, controller_id) VALUES (?, ?)";
                         try (PreparedStatement controllerStatement = connection.prepareStatement(insertControllerQuery)) {
                             // Associer chaque contrôleur au projet
                             for (int i = 0; i < controllersArray.length(); i++) {
