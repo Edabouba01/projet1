@@ -49,6 +49,11 @@ public class DataServer {
         server.createContext("/equipements", new EquipementsHandler());
         server.createContext("/data", new DataHandler(this));
         server.createContext("/ajout", new AjoutHandler());
+        server.createContext("/administrator", new AdministratorHandler());
+        server.createContext("/objet", new ObjectHandler());
+        server.createContext("/projet", new ProjectHandler());
+        server.createContext("/user", new UserHandler());
+        server.createContext("/controller", new ControllerHandler());
         server.setExecutor(null);
         server.start();
     }
@@ -221,6 +226,532 @@ public class DataServer {
            
         }
     }
+
+
+// Debut partie projet groupe
+
+
+static class AdministratorHandler implements HttpHandler {
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                // Répondre OK aux requêtes OPTIONS
+                exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "POST, OPTIONS");
+                exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+                exchange.sendResponseHeaders(200, -1);
+                exchange.close();
+            } else if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+                try {
+                    // Récupérer les données de la requête
+                    InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), "utf-8");
+                    BufferedReader br = new BufferedReader(isr);
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    String requestData = sb.toString();
+    
+                    // Analyser les données JSON reçues
+                    JSONObject jsonObject = new JSONObject(requestData);
+    
+                    // Extraire les informations de l'objet JSON
+                    String action = jsonObject.getString("action");
+    
+                    // Créer un administrateur
+                    if (action.equals("create_admin")) {
+                        String adminName = jsonObject.getString("name");
+                        String adminEmail = jsonObject.getString("email");
+                        String adminPassword = jsonObject.getString("password");
+                        createAdministrator(adminName, adminEmail, adminPassword);
+                    }
+                    // Créer un objet
+                    else if (action.equals("create_object")) {
+                        // Implémenter la logique pour créer un objet
+                    }
+                    // Créer un projet
+                    else if (action.equals("create_project")) {
+                        // Implémenter la logique pour créer un projet
+                    }
+                    // Créer un contrôleur
+                    else if (action.equals("create_controller")) {
+                        // Implémenter la logique pour créer un contrôleur
+                    }
+    
+                    // Envoyer une réponse de succès au client
+                    String response = "Opération réussie.";
+                    exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                    exchange.sendResponseHeaders(200, response.getBytes().length);
+                    OutputStream os = exchange.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+                } catch (JSONException | SQLException e) {
+                    e.printStackTrace();
+                    // Envoyer une réponse d'erreur au client en cas d'échec
+                    String response = "Erreur lors de l'opération : " + e.getMessage();
+                    exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                    exchange.sendResponseHeaders(500, response.getBytes().length);
+                    OutputStream os = exchange.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+                }
+            } else {
+                // Envoyer une réponse 405 (Méthode non autorisée) si ce n'est pas une requête POST ou OPTIONS
+                String response = "Méthode non autorisée.";
+                exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                exchange.sendResponseHeaders(405, response.getBytes().length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            }
+        }
+    
+        private void createAdministrator(String name, String email, String password) throws SQLException {
+            // Établir une connexion à la base de données
+            try (Connection connection = new Connexion().renvoi()) {
+                // Préparer la requête SQL pour insérer un nouvel administrateur
+                String query = "INSERT INTO Administrators (name, email, password) VALUES (?, ?, ?)";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                    preparedStatement.setString(1, name);
+                    preparedStatement.setString(2, email);
+                    preparedStatement.setString(3, password);
+                    // Exécuter la requête
+                    preparedStatement.executeUpdate();
+                }
+            }
+        }
+    }
+
+
+
+
+    static class ObjectHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                // Répondre OK aux requêtes OPTIONS
+                handleOptionsRequest(exchange);
+            } else if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+                try {
+                    // Récupérer les données de la requête
+                    InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), "utf-8");
+                    BufferedReader br = new BufferedReader(isr);
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    String requestData = sb.toString();
+    
+                    // Analyser les données JSON reçues
+                    JSONObject jsonObject = new JSONObject(requestData);
+    
+                    // Extraire les informations de l'objet JSON
+                    String action = jsonObject.getString("action");
+    
+                    // Créer un objet
+                    if (action.equals("create_object")) {
+                        String objectName = jsonObject.getString("name");
+                        JSONArray controllersArray = jsonObject.getJSONArray("controllers");
+                        createObject(objectName, controllersArray);
+                    }
+    
+                    // Envoyer une réponse de succès au client
+                    String response = "Opération réussie.";
+                    exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                    exchange.sendResponseHeaders(200, response.getBytes().length);
+                    OutputStream os = exchange.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+                } catch (JSONException | SQLException e) {
+                    e.printStackTrace();
+                    // Envoyer une réponse d'erreur au client en cas d'échec
+                    String response = "Erreur lors de l'opération : " + e.getMessage();
+                    exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                    exchange.sendResponseHeaders(500, response.getBytes().length);
+                    OutputStream os = exchange.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+                }
+            } else {
+                // Envoyer une réponse 405 (Méthode non autorisée) si ce n'est pas une requête POST ou OPTIONS
+                String response = "Méthode non autorisée.";
+                exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                exchange.sendResponseHeaders(405, response.getBytes().length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            }
+        }
+    
+        private void createObject(String objectName, JSONArray controllersArray) throws SQLException {
+            // Établir une connexion à la base de données
+            try (Connection connection = new Connexion().renvoi()) {
+                // Préparer la requête SQL pour insérer un nouvel objet
+                String insertObjectQuery = "INSERT INTO Objects (name) VALUES (?)";
+                try (PreparedStatement objectStatement = connection.prepareStatement(insertObjectQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    objectStatement.setString(1, objectName);
+                    // Exécuter la requête pour insérer l'objet
+                    objectStatement.executeUpdate();
+    
+                    // Récupérer l'ID de l'objet nouvellement inséré
+                    ResultSet generatedKeys = objectStatement.getGeneratedKeys();
+                    int objectId = -1;
+                    if (generatedKeys.next()) {
+                        objectId = generatedKeys.getInt(1);
+                    }
+    
+                    // Si l'insertion de l'objet a réussi, insérer les contrôleurs associés
+                    if (objectId != -1) {
+                        // Préparer la requête SQL pour insérer les contrôleurs associés à l'objet
+                        String insertControllerQuery = "INSERT INTO OBJECT_CONTROLLER (object_id, controller_id) VALUES (?, ?)";
+                        try (PreparedStatement controllerStatement = connection.prepareStatement(insertControllerQuery)) {
+                            // Insérer chaque contrôleur associé à l'objet
+                            for (int i = 0; i < controllersArray.length(); i++) {
+                                int controllerId = controllersArray.getInt(i);
+                                controllerStatement.setInt(1, objectId);
+                                controllerStatement.setInt(2, controllerId);
+                                // Exécuter la requête pour insérer le contrôleur associé
+                                controllerStatement.executeUpdate();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    
+        private void handleOptionsRequest(HttpExchange exchange) throws IOException {
+            // Répondre OK aux requêtes OPTIONS
+            exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+            exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "POST, OPTIONS");
+            exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+            exchange.sendResponseHeaders(200, -1);
+            exchange.close();
+        }
+    }
+    
+    static class ProjectHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                // Répondre OK aux requêtes OPTIONS
+                handleOptionsRequest(exchange);
+            } else if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+                try {
+                    // Récupérer les données de la requête
+                    InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), "utf-8");
+                    BufferedReader br = new BufferedReader(isr);
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    String requestData = sb.toString();
+    
+                    // Analyser les données JSON reçues
+                    JSONObject jsonObject = new JSONObject(requestData);
+    
+                    // Extraire les informations de l'objet JSON
+                    String action = jsonObject.getString("action");
+    
+                    // Créer un projet
+                    if (action.equals("create_project")) {
+                        String projectName = jsonObject.getString("name");
+                        JSONArray controllersArray = jsonObject.getJSONArray("controllers");
+                        createProject(projectName, controllersArray);
+                    }
+    
+                    // Envoyer une réponse de succès au client
+                    String response = "Opération réussie.";
+                    exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                    exchange.sendResponseHeaders(200, response.getBytes().length);
+                    OutputStream os = exchange.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+                } catch (JSONException | SQLException e) {
+                    e.printStackTrace();
+                    // Envoyer une réponse d'erreur au client en cas d'échec
+                    String response = "Erreur lors de l'opération : " + e.getMessage();
+                    exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                    exchange.sendResponseHeaders(500, response.getBytes().length);
+                    OutputStream os = exchange.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+                }
+            } else {
+                // Envoyer une réponse 405 (Méthode non autorisée) si ce n'est pas une requête POST ou OPTIONS
+                String response = "Méthode non autorisée.";
+                exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                exchange.sendResponseHeaders(405, response.getBytes().length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            }
+        }
+    
+        private void createProject(String projectName, JSONArray controllersArray) throws SQLException {
+            // Établir une connexion à la base de données
+            try (Connection connection = new Connexion().renvoi()) {
+                // Préparer la requête SQL pour insérer un nouveau projet
+                String insertProjectQuery = "INSERT INTO Projects (name) VALUES (?)";
+                try (PreparedStatement projectStatement = connection.prepareStatement(insertProjectQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    projectStatement.setString(1, projectName);
+                    // Exécuter la requête pour insérer le projet
+                    projectStatement.executeUpdate();
+    
+                    // Récupérer l'ID du projet nouvellement inséré
+                    ResultSet generatedKeys = projectStatement.getGeneratedKeys();
+                    int projectId = -1;
+                    if (generatedKeys.next()) {
+                        projectId = generatedKeys.getInt(1);
+                    }
+    
+                    // Si l'insertion du projet a réussi, associer les contrôleurs au projet
+                    if (projectId != -1) {
+                        // Préparer la requête SQL pour associer les contrôleurs au projet
+                        String insertControllerQuery = "INSERT INTO ProjectControllers (project_id, controller_id) VALUES (?, ?)";
+                        try (PreparedStatement controllerStatement = connection.prepareStatement(insertControllerQuery)) {
+                            // Associer chaque contrôleur au projet
+                            for (int i = 0; i < controllersArray.length(); i++) {
+                                int controllerId = controllersArray.getInt(i);
+                                controllerStatement.setInt(1, projectId);
+                                controllerStatement.setInt(2, controllerId);
+                                // Exécuter la requête pour associer le contrôleur au projet
+                                controllerStatement.executeUpdate();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    
+        private void handleOptionsRequest(HttpExchange exchange) throws IOException {
+            // Répondre OK aux requêtes OPTIONS
+            exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+            exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "POST, OPTIONS");
+            exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+            exchange.sendResponseHeaders(200, -1);
+            exchange.close();
+        }
+    }
+    
+    static class UserHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                // Répondre OK aux requêtes OPTIONS
+                handleOptionsRequest(exchange);
+            } else if ("GET".equalsIgnoreCase(exchange.getRequestMethod())) {
+                handleGetRequest(exchange);
+            } else {
+                // Méthode non autorisée
+                String response = "Méthode non autorisée.";
+                exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                exchange.sendResponseHeaders(405, response.getBytes().length); // 405 Method Not Allowed
+                OutputStream os = exchange.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            }
+        }
+    
+        private void handleGetRequest(HttpExchange exchange) throws IOException {
+            try {
+                // Récupérer les données de l'utilisateur depuis la base de données
+                JSONArray userData = getUserDataFromDatabase();
+    
+                // Configuration des en-têtes de la réponse
+                exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                exchange.getResponseHeaders().add("Content-Type", "application/json");
+    
+                // Envoi de l'en-tête CORS avant d'envoyer les en-têtes de réponse
+                exchange.sendResponseHeaders(200, userData.toString().getBytes().length);
+    
+                // Envoi de la réponse au client
+                OutputStream outputStream = exchange.getResponseBody();
+                outputStream.write(userData.toString().getBytes());
+                outputStream.close();
+            } catch (SQLException | JSONException e) {
+                e.printStackTrace();
+                String errorMessage = "{\"error\": \"Une erreur s'est produite lors de la récupération des données utilisateur.\"}";
+                exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                exchange.sendResponseHeaders(500, errorMessage.getBytes().length); // 500 Internal Server Error
+                OutputStream os = exchange.getResponseBody();
+                os.write(errorMessage.getBytes());
+                os.close();
+            }
+        }
+    
+        private JSONArray getUserDataFromDatabase() throws SQLException, JSONException {
+            JSONArray jsonArray = new JSONArray();
+    
+            // Établir une connexion à la base de données
+            try (Connection connection = new Connexion().renvoi()){
+                // Exécuter la requête pour récupérer les données de l'utilisateur et ses projets associés
+                String query = "SELECT u.id AS user_id, u.username, p.id AS project_id, p.project_name " +
+                        "FROM users u " +
+                        "LEFT JOIN user_projects up ON u.id = up.user_id " +
+                        "LEFT JOIN projects p ON up.project_id = p.id";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                    try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                        // Créer un objet JSON pour chaque ligne de résultat
+                        while (resultSet.next()) {
+                            JSONObject userObject = new JSONObject();
+                            userObject.put("user_id", resultSet.getInt("user_id"));
+                            userObject.put("username", resultSet.getString("username"));
+    
+                            int projectId = resultSet.getInt("project_id");
+                            if (!resultSet.wasNull()) {
+                                JSONObject projectObject = new JSONObject();
+                                projectObject.put("project_id", projectId);
+                                projectObject.put("project_name", resultSet.getString("project_name"));
+    
+                                // Vérifier si le projet existe déjà dans le tableau JSON
+                                boolean projectExists = false;
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject obj = jsonArray.getJSONObject(i);
+                                    if (obj.getInt("user_id") == resultSet.getInt("user_id")) {
+                                        JSONArray projectsArray = obj.getJSONArray("projects");
+                                        projectsArray.put(projectObject);
+                                        projectExists = true;
+                                        break;
+                                    }
+                                }
+    
+                                // Si l'utilisateur n'a pas encore été ajouté à la liste JSON
+                                if (!projectExists) {
+                                    JSONArray projectsArray = new JSONArray();
+                                    projectsArray.put(projectObject);
+                                    userObject.put("projects", projectsArray);
+                                    jsonArray.put(userObject);
+                                }
+                            } else {
+                                userObject.put("projects", new JSONArray());
+                                jsonArray.put(userObject);
+                            }
+                        }
+                    }
+                }
+            }
+    
+            return jsonArray;
+        }
+    
+        private void handleOptionsRequest(HttpExchange exchange) throws IOException {
+            // Répondre OK aux requêtes OPTIONS
+            exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+            exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, OPTIONS");
+            exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+            exchange.sendResponseHeaders(200, -1);
+            exchange.close();
+        }
+    }
+    
+
+
+    static class ControllerHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                // Répondre OK aux requêtes OPTIONS
+                handleOptionsRequest(exchange);
+            } else if ("GET".equalsIgnoreCase(exchange.getRequestMethod())) {
+                handleGetRequest(exchange);
+            } else {
+                // Méthode non autorisée
+                String response = "Méthode non autorisée.";
+                exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                exchange.sendResponseHeaders(405, response.getBytes().length); // 405 Method Not Allowed
+                OutputStream os = exchange.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            }
+        }
+    
+        private void handleGetRequest(HttpExchange exchange) throws IOException {
+            try {
+                // Récupérer les données des contrôleurs depuis la base de données
+                JSONArray controllerData = getControllerDataFromDatabase();
+    
+                // Configuration des en-têtes de la réponse
+                exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                exchange.getResponseHeaders().add("Content-Type", "application/json");
+    
+                // Envoi de l'en-tête CORS avant d'envoyer les en-têtes de réponse
+                exchange.sendResponseHeaders(200, controllerData.toString().getBytes().length);
+    
+                // Envoi de la réponse au client
+                OutputStream outputStream = exchange.getResponseBody();
+                outputStream.write(controllerData.toString().getBytes());
+                outputStream.close();
+            } catch (SQLException | JSONException e) {
+                e.printStackTrace();
+                String errorMessage = "{\"error\": \"Une erreur s'est produite lors de la récupération des données des contrôleurs.\"}";
+                exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                exchange.sendResponseHeaders(500, errorMessage.getBytes().length); // 500 Internal Server Error
+                OutputStream os = exchange.getResponseBody();
+                os.write(errorMessage.getBytes());
+                os.close();
+            }
+        }
+    
+        private JSONArray getControllerDataFromDatabase() throws SQLException, JSONException {
+            JSONArray jsonArray = new JSONArray();
+    
+            // Établir une connexion à la base de données
+            try (Connection connection = new Connexion().renvoi()) {
+                // Exécuter la requête pour récupérer les données des contrôleurs et leurs capteurs/actionneurs associés
+                String query = "SELECT c.id AS controller_id, c.controller_name, " +
+                        "ca.type AS control_type, " +
+                        "COALESCE(a.actuator_name, cap.captor_name) AS controlled_component " +
+                        "FROM controllers c " +
+                        "LEFT JOIN controller_actuators ca ON c.id = ca.controller_id " +
+                        "LEFT JOIN actuators a ON ca.actuator_id = a.id " +
+                        "LEFT JOIN controller_captors cc ON c.id = cc.controller_id " +
+                        "LEFT JOIN captors cap ON cc.captor_id = cap.id";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                    try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                        // Créer un objet JSON pour chaque ligne de résultat
+                        while (resultSet.next()) {
+                            JSONObject controllerObject = new JSONObject();
+                            controllerObject.put("controller_id", resultSet.getInt("controller_id"));
+                            controllerObject.put("controller_name", resultSet.getString("controller_name"));
+    
+                            String controlType = resultSet.getString("control_type");
+                            if ("actuator".equals(controlType)) {
+                                controllerObject.put("actuator_name", resultSet.getString("controlled_component"));
+                            } else if ("captor".equals(controlType)) {
+                                controllerObject.put("captor_name", resultSet.getString("controlled_component"));
+                            }
+    
+                            jsonArray.put(controllerObject);
+                        }
+                    }
+                }
+            }
+    
+            return jsonArray;
+        }
+    
+        private void handleOptionsRequest(HttpExchange exchange) throws IOException {
+            // Répondre OK aux requêtes OPTIONS
+            exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+            exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, OPTIONS");
+            exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+            exchange.sendResponseHeaders(200, -1);
+            exchange.close();
+        }
+    }
+    
+
+
+
+    //Fin partie projet groupe 
+
+
+
+
+
 
 
 

@@ -6,6 +6,7 @@ import java.util.Properties;
 
 public class Connexion {
 
+    // Méthode de connexion à la base de données
     public Connection renvoi() {
         Connection connection = null;
 
@@ -19,10 +20,8 @@ public class Connexion {
             connection = DriverManager.getConnection(dbUrl, properties);
             System.out.println("\nConnecté à la base de données PostgreSQL");
 
-
             // Créer les tables nécessaires
             createTables(connection);
-
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -31,39 +30,153 @@ public class Connexion {
         return connection;
     }
 
+    // Méthode pour créer les tables
     private void createTables(Connection connection) {
-        createEnregistrementsTable(connection);
-        createCapteursTable(connection);
-        createActuateursTable(connection);
-       
+        createUsersTable(connection);
+        createAdministratorsTable(connection);
+        createObjectsTable(connection);
+        createProjectsTable(connection);
+        createUserProjectTable(connection);
+        createControllersTable(connection);
+        createObjectControllerTable(connection);
+        createActuatorsTable(connection);
+        createCaptorsTable(connection);
+        createControllerCaptorsTable(connection);
+        createControllerActuatorsTable(connection);
+        createProjectControllersTable(connection); // Nouvelle table de liaison
     }
 
-    private void createEnregistrementsTable(Connection connection) {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS Equipements (id SERIAL PRIMARY KEY, nomobjet VARCHAR(255) NOT NULL, addressip VARCHAR(255) NOT NULL)";
-        executeCreateTable(connection, createTableSQL, "Equipements");
-    }
-
-    private void createCapteursTable(Connection connection) {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS capteurs (" +
+    // Méthode pour créer la table des utilisateurs
+    private void createUsersTable(Connection connection) {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS USER (" +
                 "id SERIAL PRIMARY KEY, " +
-                "id_Equipements INTEGER REFERENCES Equipements(id), " +
-                "typemesure VARCHAR(255) NOT NULL, " + 
-                "valeur INT NOT NULL, " +
-                "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)";
-        executeCreateTable(connection, createTableSQL, "capteurs");
+                "name VARCHAR(255) NOT NULL, " +
+                "email VARCHAR(255) NOT NULL, " +
+                "password VARCHAR(255) NOT NULL)";
+        executeCreateTable(connection, createTableSQL, "USER");
     }
 
-    private void createActuateursTable(Connection connection) {
-        String createTableSQL = "CREATE TABLE IF NOT EXISTS actuateurs (" +
+    // Méthode pour créer la table des administrateurs
+    private void createAdministratorsTable(Connection connection) {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS ADMINISTRATOR (" +
                 "id SERIAL PRIMARY KEY, " +
-                "id_Equipements INTEGER REFERENCES Equipements(id), " +
-                "type_action VARCHAR(255) NOT NULL, " +
-                "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)";
-        executeCreateTable(connection, createTableSQL, "actuateurs");
+                "email VARCHAR(255) NOT NULL, " +
+                "name VARCHAR(255) NOT NULL, " +
+                "password VARCHAR(255) NOT NULL, " +
+                "role VARCHAR(255) NOT NULL)";
+        executeCreateTable(connection, createTableSQL, "ADMINISTRATOR");
     }
 
-   
+    // Méthode pour créer la table des objets
+    private void createObjectsTable(Connection connection) {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS OBJET (" +
+                "id SERIAL PRIMARY KEY, " +
+                "name VARCHAR(255) NOT NULL, " +
+                "description TEXT)";
+        executeCreateTable(connection, createTableSQL, "OBJET");
+    }
 
+    // Méthode pour créer la table des projets
+    private void createProjectsTable(Connection connection) {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS PROJECT (" +
+                "id SERIAL PRIMARY KEY, " +
+                "title VARCHAR(255) NOT NULL, " +
+                "description TEXT)";
+        executeCreateTable(connection, createTableSQL, "PROJECT");
+    }
+
+    // Méthode pour créer la table de liaison entre les utilisateurs et les projets
+    private void createUserProjectTable(Connection connection) {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS USER_PROJECT (" +
+                "user_id INTEGER REFERENCES USER(id), " +
+                "project_id INTEGER REFERENCES PROJECT(id), " +
+                "PRIMARY KEY (user_id, project_id))";
+        executeCreateTable(connection, createTableSQL, "USER_PROJECT");
+    }
+
+    // Méthode pour créer la table des contrôleurs
+    private void createControllersTable(Connection connection) {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS CONTROLLER (" +
+                "id SERIAL PRIMARY KEY, " +
+                "name VARCHAR(255) NOT NULL, " +
+                "description TEXT)";
+        executeCreateTable(connection, createTableSQL, "CONTROLLER");
+    }
+
+    // Méthode pour créer la table de liaison entre les objets et les contrôleurs
+    private void createObjectControllerTable(Connection connection) {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS OBJECT_CONTROLLER (" +
+                "object_id INTEGER REFERENCES OBJET(id), " +
+                "controller_id INTEGER REFERENCES CONTROLLER(id), " +
+                "PRIMARY KEY (object_id, controller_id))";
+        executeCreateTable(connection, createTableSQL, "OBJECT_CONTROLLER");
+    }
+
+    // Méthode pour créer la table des actuateurs
+    private void createActuatorsTable(Connection connection) {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS ACTUATOR (" +
+                "id SERIAL PRIMARY KEY, " +
+                "name VARCHAR(255) NOT NULL, " +
+                "description TEXT)";
+        executeCreateTable(connection, createTableSQL, "ACTUATOR");
+    }
+
+    // Méthode pour créer la table des capteurs
+    private void createCaptorsTable(Connection connection) {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS CAPTOR (" +
+                "id SERIAL PRIMARY KEY, " +
+                "name VARCHAR(255) NOT NULL, " +
+                "description TEXT)";
+        executeCreateTable(connection, createTableSQL, "CAPTOR");
+    }
+
+    // Méthode pour créer la table de liaison entre les contrôleurs et les capteurs
+    private void createControllerCaptorsTable(Connection connection)
+    {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS CONTROLLER_CAPTORS (" +
+                "id SERIAL PRIMARY KEY, " +
+                "controller_id INTEGER REFERENCES CONTROLLER(id), " +
+                "captor_id INTEGER REFERENCES CAPTOR(id), " +
+                "value VARCHAR(255), " +
+                "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)";
+        executeCreateTable(connection, createTableSQL, "CONTROLLER_CAPTORS");
+    }
+
+    // Méthode pour créer la table de liaison entre les contrôleurs et les actionneurs
+    private void createControllerActuatorsTable(Connection connection) {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS CONTROLLER_ACTUATORS (" +
+                "id SERIAL PRIMARY KEY, " +
+                "controller_id INTEGER REFERENCES CONTROLLER(id), " +
+                "actuator_id INTEGER REFERENCES ACTUATOR(id), " +
+                "status VARCHAR(255), " +
+                "values VARCHAR(255), " +
+                "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)";
+        executeCreateTable(connection, createTableSQL, "CONTROLLER_ACTUATORS");
+    }
+
+    // Méthode pour créer la table de liaison entre les projets et les contrôleurs
+    private void createProjectControllersTable(Connection connection) {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS PROJECT_CONTROLLERS (" +
+                "project_id INTEGER REFERENCES PROJECT(id), " +
+                "controller_id INTEGER REFERENCES CONTROLLER(id), " +
+                "PRIMARY KEY (project_id, controller_id))";
+        executeCreateTable(connection, createTableSQL, "PROJECT_CONTROLLERS");
+    }
+
+    // Méthode pour ajouter un contrôleur à un projet
+    public void addControllerToProject(Connection connection, int projectId, int controllerId) {
+        String insertAssignmentSQL = "INSERT INTO PROJECT_CONTROLLERS (project_id, controller_id) VALUES (?, ?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertAssignmentSQL)) {
+            preparedStatement.setInt(1, projectId);
+            preparedStatement.setInt(2, controllerId);
+            preparedStatement.executeUpdate();
+            System.out.println("Contrôleur ajouté au projet avec succès.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Méthode pour exécuter une requête de création de table
     private void executeCreateTable(Connection connection, String createTableSQL, String tableName) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(createTableSQL)) {
             preparedStatement.executeUpdate();
@@ -73,4 +186,3 @@ public class Connexion {
         }
     }
 }
-
